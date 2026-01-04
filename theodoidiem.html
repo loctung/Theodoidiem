@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="vi">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Theo dõi kết quả học tập</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="theodoidiem.css">
+</head>
+
+<body>
+  <div class="wrap">
+    <h1>📘 Theo dõi kết quả học tập (tĩnh – lưu localStorage)</h1>
+
+    <div class="grid">
+      <!-- LEFT -->
+      <div class="card">
+
+        <!-- HƯỚNG DẪN -->
+        <div class="guide" id="guideBox" style="margin-top:12px">
+          <div class="guide-head">
+            <div class="guide-title">📌 Hướng dẫn</div>
+            <button id="toggleGuide" class="btn ghost" type="button">Thu gọn</button>
+          </div>
+
+          <div class="guide-body" id="guideBody">
+            <ol class="guide-list">
+              <li>
+                Nhấn <b>+ Thêm kỳ</b> để tạo kỳ học.
+                <div class="muted" style="margin-top:6px">
+                  Khi thêm kỳ xong thì sẽ có 2 chế độ nhập:
+                </div>
+                <ul style="margin:8px 0 0; padding-left:18px; line-height:1.55">
+                  <li style="margin-bottom:8px">
+                    <b>Nhập điểm tổng kết kỳ</b>
+                    (Chỉ nhập theo cách này khi mọi người <b>không học lại</b> môn nào trong kỳ này và
+                    <b>không muốn học nâng điểm</b> môn nào).
+                    Nếu nhập theo cách này thì điểm tổng kết GPA có thể bị sai số một chút
+                    (<b>tối đa 0,01</b>).
+                  </li>
+                  <li>
+                    <b>Nhập điểm theo từng môn</b> (<b>Nên nhập theo cách này</b>).
+                    Chỉ cần ấn <b>+ Thêm môn</b> rồi nhập <b>số tín chỉ</b> và <b>điểm hệ 10</b> của môn đấy là được.
+                    Tên môn không cần nhập cũng được. Nếu dùng dùng nhiều thì cứ nhập tên môn vào cho đỡ nhầm.
+                    Vì khi thoát ra thì số liệu nó vẫn lưu trên trình duyệt, lần sau vào không phải nhập lại nữa.
+                  </li>
+                </ul>
+              </li>
+
+              <li style="margin-top:10px">
+                Trong phần <b>Nhập điểm theo từng môn</b>: <br>
+                Mấy môn <b>không tính vào GPA</b> như
+                Giáo dục quốc phòng, Giáo dục thể chất, Tiếng Anh A1 A2 thì không cần nhập.
+              </li>
+
+              <li style="margin-top:10px">
+                Cũng trong phần <b>Nhập điểm theo từng môn</b>:
+                <ul style="margin:8px 0 0; padding-left:18px; line-height:1.55">
+                  <li style="margin-bottom:8px">
+                    Mấy môn có điểm <b>C+</b>/<b>C</b>/<b>D+</b>/<b>D</b> thì cột <b>Ghi chú</b> sẽ hiện
+                    <b>Học nâng điểm</b>. Bấm vào sẽ hiện thêm 1 hàng để nhập điểm sau khi nâng.
+                  </li>
+                  <li>
+                    Môn nào có điểm <b>F+</b> hoặc <b>F</b> thì cột <b>Ghi chú</b> sẽ hiện <b>Học lại</b>.
+                  </li>
+                </ul>
+              </li>
+
+              <li style="margin-top:10px">
+                Với những kỳ chưa học thì chọn chế độ <b>Nhập điểm tổng kết kỳ</b>.
+                Chỉ cần nhập <b>số tín chỉ</b> và để trống GPA kỳ.
+                Phần <b>Mục tiêu loại bằng</b> sẽ tự tính tổng tín chỉ chưa học và GPA cần đạt cho phần còn lại.
+              </li>
+
+              <li style="margin-top:10px">
+                Mọi người để ý là nếu học quá 5% số tín chỉ thì sẽ bị hạ bằng (chỉ áp dụng đối với bằng giỏi và xuất
+                sắc).
+                Cái này mọi người tự xem nhá.
+              </li>
+
+              <li style="margin-top:10px">
+                Mọi người nếu có góp ý hoặc thông tin bổ sung cho mục 5 thì liên hệ mình qua email
+                <a href="https://mail.google.com/mail/?view=cm&fs=1&to=loctung126@gmail.com"
+                   target="_blank" rel="noopener noreferrer">
+                  loctung126@gmail.com
+                </a>
+                nhá.
+                <br>
+                Mình sẽ kiểm tra rồi cập nhật lại.
+                <br>
+                Cảm ơn mọi người!
+              </li>
+            </ol>
+          </div>
+        </div>
+
+        <div id="terms" style="margin-top:10px"></div>
+
+        <!-- Nút cuối -->
+        <div class="row" style="justify-content:flex-end;margin-top:12px">
+          <button id="reset" class="btn danger">Xóa dữ liệu</button>
+          <button id="addTerm" class="btn primary">+ Thêm kỳ</button>
+        </div>
+      </div>
+
+      <!-- RIGHT (sticky) -->
+      <div class="card sticky">
+        <h3 style="margin:0 0 10px">Tổng quan</h3>
+
+        <div class="kpi">
+          <div class="box">
+            <div class="muted">Tổng số tín chỉ</div>
+            <div class="big" id="creditsAll">0</div>
+          </div>
+          <div class="box">
+            <div class="muted">Tổng số tín chỉ tích lũy</div>
+            <div class="big" id="creditsPass">0</div>
+          </div>
+
+          <div class="box">
+            <div class="muted">Điểm TB hệ 4</div>
+            <div class="big" id="gpaAll">0.00</div>
+          </div>
+          <div class="box">
+            <div class="muted">Điểm TB tích lũy hệ 4</div>
+            <div class="big" id="gpaPass">0.00</div>
+          </div>
+
+          <div class="box">
+            <div class="muted">Tổng số tín chỉ học lại</div>
+            <div class="big" id="creditsRetake">0</div>
+          </div>
+
+          <div class="box" style="grid-column:1 / -1">
+            <div class="muted">Loại bằng hiện tại</div>
+            <div class="big" id="degree">—</div>
+          </div>
+        </div>
+
+        <hr style="border:none;border-top:2px solid var(--line);margin:14px 0">
+
+        <h3 style="margin:0 0 10px">Mục tiêu loại bằng</h3>
+
+        <div class="box" style="margin-bottom:10px">
+          <div class="muted">Số tín chỉ chưa học</div>
+          <div class="big" id="unlearnedCredits">0</div>
+        </div>
+
+        <div class="row">
+          <div style="flex:1">
+            <label>Mục tiêu của bạn là loại bằng</label>
+            <select id="target">
+              <option value="2.5">Khá (2.5)</option>
+              <option value="3.2">Giỏi (3.2)</option>
+              <option value="3.6">Xuất sắc (3.6)</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="margin-top:10px" class="box" id="needBox">
+          <div class="muted" id="goalLine">Mục tiêu của bạn là loại bằng: —</div>
+          <div class="big" id="need">—</div>
+          <div class="muted" id="needNote"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JS -->
+  <script src="theodoidiem.js"></script>
+</body>
+
+</html>
